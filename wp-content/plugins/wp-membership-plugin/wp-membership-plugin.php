@@ -226,7 +226,7 @@
 					if (isset($_POST[$customField['name']]) && trim($_POST[$customField['name']]))
 					{
 						$value = $_POST[$customField['name']];
-						update_post_meta($post_id, $customField['name'], $value);
+						update_post_meta($post_id, $customField['name'], sanitize_text_field($value));
 					}
 					else
 					{

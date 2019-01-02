@@ -3,14 +3,61 @@
 	 Plugin Name: WP Membership Plugin
 	 Plugin URI: https://github.com/sytnei/wp-membership-theme
 	 Description: WPMP
-	 Version: 1
+	 Version: 1.03
 	 Author: Ciocoiu Ionut Marius
 	 Author URI: https://github.com/sytnei/
 	 */
 
+	/**
+	 * Globals used in the plugin,
+	 * @global float $GLOBALS['WPMP_VERSION']
+	 * @global float $GLOBALS['WPMP_REQUIRED_WP_VERSION']
+	 * @global string $GLOBALS['WPMP_PLUGIN']
+	 * @global string $GLOBALS['WPMP_PLUGIN_BASENAME']
+	 * @global string $GLOBALS['WPMP_PLUGIN_NAME']
+	 * @global string $GLOBALS['WPMP_PLUGIN_DIR']
+	 * @global string $GLOBALS['WPMP_PLUGIN_URI']
+	 */
+
+	define('WPMP_VERSION', 1.03);
+	define('WPMP_REQUIRED_WP_VERSION', '4.7');
+	define('WPMP_PLUGIN', __FILE__);
+	define('WPMP_PLUGIN_BASENAME', plugin_basename(WPMP_PLUGIN));
+	define('WPMP_PLUGIN_NAME', trim(dirname(WPMP_PLUGIN_BASENAME), '/'));
+	define('WPMP_PLUGIN_DIR', untrailingslashit(dirname(WPMP_PLUGIN)));
+	define('WPMP_PLUGIN_URI', plugins_url(WPMP_PLUGIN_NAME));
+
+	/**
+	 * Class used to generate a list of users setup in a custom post type called
+	 * members.
+	 *
+	 * @category   WP Membership Plugin
+	 * @package    WP Membership Plugin
+	 * @author     Ciocoiu Ionut Marius <author@example.com>
+	 * @copyright  2019 Ciocoiu Ionut Marius
+	 * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+	 * @version    1.03
+	 * @link       https://github.com/sytnei/wp-membership-theme
+	 * @see        NetOther, Net_Sample::Net_Sample()
+	 * @since      File available since Release 1.0.3
+	 */
+
 	class wp_membership_plugin
 	{
+		/**
+		 * $postTypes - stores a list of post types, when saving in the databased is made
+		 * @var array
+		 * @access private
+		 */
+
 		private $postTypes = array();
+
+		/**
+		 * $customFields - stores a list of fields, it is used to store the members
+		 * attributes
+		 * @var array
+		 * @access private
+		 */
 		private $customFields = array();
 
 		function __construct()
@@ -29,21 +76,45 @@
 				$this,
 				'add_custom_fields_to_team_members'
 			), 1, 2);
-  
+
 			add_action('save_post', array(
 				$this,
 				'save_custom_fields'
 			), 1, 2);
-		}
 
-		function wp_membership_plugin()
-		{
-			$this -> __construct();
+			add_shortcode('wpmplist', array(
+				$this,
+				'wp_membership_plugin_shortcode'
+			));
+
+			add_action('wp_enqueue_scripts', array(
+				$this,
+				'add_scripts'
+			));
+
+			add_action('wp_enqueue_scripts', array(
+				$this,
+				'add_stylesheet'
+			));
+
+			add_action('wp_ajax_nopriv_list_members', array(
+				$this,
+				'list_members'
+			), 1000);
+
+			add_action('wp_ajax_list_members', array(
+				$this,
+				'list_members'
+			), 1000);
+
 		}
 
 		/**
 		 * custom_post_type_register - Method used to register Team Members custom post
 		 * type
+		 * @access public
+		 * @var none
+		 * @return empty
 		 */
 
 		function custom_post_types_register()
@@ -89,6 +160,14 @@
 			register_post_type('team-member', $args);
 		}
 
+		/**
+		 * custom_taxonomies_register - Method used to register Department Taxonomy
+		 * associated  with the Team Members custom post type
+		 * @access public
+		 * @var none
+		 * @return empty
+		 */
+
 		function custom_taxonomies_register()
 		{
 
@@ -117,6 +196,14 @@
 
 			register_taxonomy('department', array('team-member'), $args);
 		}
+
+		/**
+		 * add_custom_fields_to_team_members - Method used to add custom fields to Team
+		 * Members post type - it creates a metabox for team mebers
+		 * @access public
+		 * @var none
+		 * @return empty
+		 */
 
 		function add_custom_fields_to_team_members()
 		{
@@ -151,13 +238,21 @@
 
 			foreach ($this->postTypes as $postType)
 			{
-				add_meta_box('wp-membership-plugin-custom-fields', __('Team Members Settings'), array(
+				add_meta_box('wp-membership-plugin-custom-fields', __('Team Members Settings', 'wp_membership_plugin'), array(
 					$this,
 					'display_custom_fields'
 				), $postType, 'normal', 'high');
 			}
 
 		}
+
+		/**
+		 * display_custom_fields - Method used to display the custom fields that are
+		 * added to the custom post types
+		 * @access public
+		 * @var none
+		 * @return empty
+		 */
 
 		function display_custom_fields()
 		{
@@ -188,11 +283,9 @@
 						break;
 				}
 
-				// Check capability
 				if (!current_user_can($customField['capability'], $post -> ID))
 					$output = false;
 
-				// Output if allowed
 				if ($output)
 				{
 
@@ -207,6 +300,14 @@
 
 			echo '</div>';
 		}
+
+		/**
+		 * save_custom_fields - Method used to save custom fields for custom post types
+		 * @access public
+		 * @var integer $post_id
+		 * @var object $post
+		 * @return empty
+		 */
 
 		function save_custom_fields($post_id, $post)
 		{
@@ -236,6 +337,152 @@
 			}
 		}
 
+		/**
+		 * add_stylesheet - Method used to add css to the plugin in front end
+		 * @access public
+		 * @var none
+		 * @return empty
+		 */
+
+		function add_stylesheet()
+		{
+			wp_enqueue_style('wpmp-styles', WPMP_PLUGIN_URI . '/assets/css/styles.css', array(), WPMP_VERSION);
+		}
+
+		/**
+		 * add_scripts - Method used to add javascript for the plugin in front end
+		 * @access public
+		 * @var none
+		 * @return empty
+		 */
+
+		function add_scripts()
+		{
+
+			wp_enqueue_script('wpmp-scripts', WPMP_PLUGIN_URI . '/assets/js/scripts.js', array("jquery"), WPMP_VERSION, true);
+		}
+
+		/**
+		 * list_members - Method used to display the list of members, it is also used for
+		 * the ajax call, and also in the shortcode when are loaded the firs members
+		 * if the variable $_GET['wpmp_page'] is set up, when the ajax call is made, we
+		 * print the content, otherwise we return a string with the list of the members
+		 * @access public
+		 * @var none
+		 * @return string - the list of team members
+		 */
+
+		function list_members()
+		{
+
+			$args = array(
+				"post_type" => "team-member",
+				"posts_per_page" => 3, //this is hardcoded, normaly should get the limit of posts
+				// per page from admin options settings
+				'paged' => isset($_GET['wpmp_page']) ? $_GET['wpmp_page'] : 1
+			);
+
+			$teammembers = new WP_Query($args);
+
+			$content = "";
+
+			if ($teammembers -> have_posts())
+			{
+
+				while ($teammembers -> have_posts())
+				{
+
+					$teammembers -> the_post();
+
+					$image = get_the_post_thumbnail(get_the_ID(), 'thumbnail');
+					$title = get_the_title();
+					$description = get_the_content();
+					$position = get_post_meta(get_the_ID(), "_position", true);
+					$twitter_url = get_post_meta(get_the_ID(), "_twitter_url", true);
+					$facebook_url = get_post_meta(get_the_ID(), "_facebook_url", true);
+
+					$content .= '<div class="col-md-4 text-center">
+	                					<center>' . $image . '
+		                					<br /> 
+		                					<h3>' . $title . '</h3>
+		                					<h4>' . $position . '</h4>';
+
+					if ($facebook_url != "")
+					{
+						$content .= '<a href="' . $facebook_url . '" target="_blank"><i class="fa fa-facebook"></i></a> &nbsp;&nbsp;';
+					}
+
+					if ($twitter_url != "")
+					{
+						$content .= '<a href="' . $twitter_url . '" target="_blank"><i class="fa fa-twitter"></i></a>';
+					}
+
+					$content .= '<br />	 
+		                			 <a href="#" class="btn btn-primary btn-small btn--see-description">' . __("Read more", 'wp_membership_plugin') . '</a>
+		                		     <br />
+		                		     <div style="display:none">
+		                			      ' . $description . '
+		                		     </div>
+		                		
+		                	</center>
+		                	
+	                	</div>';
+
+				}
+
+				wp_reset_postdata();
+			}
+
+			if (isset($_GET['wpmp_page']))
+			{
+				echo $content;
+				exit ;
+			}
+			else
+			{
+				return $content;
+			}
+		}
+
+		/**
+		 * wp_membership_plugin_shortcode - Method used to register the shortcode that
+		 * will generate the list of members
+		 * @access public
+		 * @var none
+		 * @return string - the content of the shortcode
+		 */
+
+		function wp_membership_plugin_shortcode()
+		{
+			$content = '';
+
+			$content .= '<div class="container">
+		
+							<div class="row">
+								<div class="col-md-12">
+									<h1>' . __("Team Members", 'wp_membership_plugin') . '</h2>
+								</div>	
+							</div>	
+							<div class="row" id="wpmp-ajax-container">';
+
+			$content .= $this -> list_members();
+
+			$content .= '</div>
+					</div>';
+
+			$content .= '<script>
+			 				    var wpmp_ajax_url = "' . admin_url('admin-ajax.php') . '";
+			               </script>
+			              <center><a href="javascript:void(0);" class="btn btn--wpmp-more-items"><span class="down">&darr;</span></a></center>';
+
+			return $content;
+
+		}
+
 	}
+
+	/**
+	 * Initialise the plugin
+	 */
 
 	$wp_membership_plugin = new wp_membership_plugin();

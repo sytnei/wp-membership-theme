@@ -1,0 +1,75 @@
+.btn--wpmp-more-items {
+	background-color: #0062cc !important;
+    color: #ffffff !important;
+    border-radius: 50%;
+    line-height: 34px !important;
+    padding: 0px !important;
+    font-size: 22px !important;
+    display: block;
+    margin: 30px auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50% !important;
+}
+
+.btn--wpmp-more-items:hover, .btn--wpmp-more-items:focus {
+	background: #aea6fb;
+	color: #ffffff !important;
+	text-decoration:none; 
+}
+
+.btn--wpmp-more-items .down { 
+    display: block;
+    -webkit-animation: pulse 2s infinite;
+    animation: pulse 2s infinite;
+    color: #fefefe;
+    text-align: center; 
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.btn--wpmp-more-items:hover .down { 
+	color: #ffffff;
+}
+
+@-webkit-keyframes pulse {
+    0% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+    50% {
+        -webkit-transform: translate(0, 10px);
+        transform: translate(0, 10px);
+    }
+    100% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+    50% {
+        -webkit-transform: translate(0, 10px);
+        transform: translate(0, 10px);
+    }
+    100% {
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0);
+    }
+}
+
+.wpmp-ajax-loader {
+	background: transparent url(../img/ajax_load_img.gif) no-repeat center;
+	width: 100%; 
+	min-height: 8rem; 
+	background-size: 10rem;
+	z-index: 99;
+    position: relative;
+    margin-top:5rem;
+}
+
+

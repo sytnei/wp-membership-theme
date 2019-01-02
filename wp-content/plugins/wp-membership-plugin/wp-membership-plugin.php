@@ -10,8 +10,7 @@
 
 	/**
 	 * Globals used in the plugin,
-	 * @global float $GLOBALS['WPMP_VERSION']
-	 * @global float $GLOBALS['WPMP_REQUIRED_WP_VERSION']
+	 * @global float $GLOBALS['WPMP_VERSION'] 
 	 * @global string $GLOBALS['WPMP_PLUGIN']
 	 * @global string $GLOBALS['WPMP_PLUGIN_BASENAME']
 	 * @global string $GLOBALS['WPMP_PLUGIN_NAME']
@@ -19,8 +18,7 @@
 	 * @global string $GLOBALS['WPMP_PLUGIN_URI']
 	 */
 
-	define('WPMP_VERSION', 1.03);
-	define('WPMP_REQUIRED_WP_VERSION', '4.7');
+	define('WPMP_VERSION', 1.03); 
 	define('WPMP_PLUGIN', __FILE__);
 	define('WPMP_PLUGIN_BASENAME', plugin_basename(WPMP_PLUGIN));
 	define('WPMP_PLUGIN_NAME', trim(dirname(WPMP_PLUGIN_BASENAME), '/'));

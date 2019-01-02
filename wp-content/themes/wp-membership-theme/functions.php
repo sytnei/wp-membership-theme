@@ -74,9 +74,6 @@ function wp_membership_theme_scripts() {
     
     wp_enqueue_style( 'wp-membership-theme-styles-custom', get_template_directory_uri() .'/css/wp-membership-theme.min.css' );
   
-	wp_enqueue_script( 'wp-membership-theme-scripts', get_template_directory_uri() . '/js/wp-membership-theme.min.js', array(), '20151215', true );
-
- 
 }
 
 add_action( 'wp_enqueue_scripts', 'wp_membership_theme_scripts' );

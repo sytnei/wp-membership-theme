@@ -35,8 +35,7 @@
 	 * @copyright  2019 Ciocoiu Ionut Marius
 	 * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
 	 * @version    1.03
-	 * @link       https://github.com/sytnei/wp-membership-theme
-	 * @see        NetOther, Net_Sample::Net_Sample()
+	 * @link       https://github.com/sytnei/wp-membership-theme 
 	 * @since      File available since Release 1.0.3
 	 */
 
